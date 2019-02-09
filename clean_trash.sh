@@ -12,7 +12,7 @@
 
 TRASH_DIR="$HOME/.trash"          # Path to the trash directory
 LOG_FILE="$HOME/.clean_trash.log" # Path to the log file of removes from trash
-MAX_DELAY=$((3 * 24 * 60 * 60))   # Time after which files on the trash are removed
+MAX_DELAY=$((1))   # Time after which files on the trash are removed
 
 ####################################################
 
@@ -30,20 +30,22 @@ removes=() # Holds the logs of removes
 
 # Iterate over all files on the trash
 for filename in $(ls $TRASH_DIR) ; do
+  filepath="$TRASH_DIR/$filename"
+
   # Time when the file was moved to the trash
-  time_last_change=$(stat -c "%Z" $filename)
+  time_last_change=$(stat -c "%Z" $filepath)
 
   # Calculate the time that has passed since the move to the trash
   delay=$(($(date +"%s") - time_last_change))
 
   # If the delay calculated exceeded the max delay defined remove it
   if [[ delay -gt MAX_DELAY ]] ; then
-    if [[ -d $filename ]] ; then
-      rm -r $filename
-      removes+=("Removed directory $filename | Last change on $(stat -c '%z' $filename)")
+    if [[ -d $filepath ]] ; then
+      removes+=("Removed directory $filename | Last change on $(stat -c '%z' $filepath)")
+      rm -r $filepath
     else
-      rm $filename
-      removes+=("Removed file $filename | Last change on $(stat -c '%z' $filename)")
+      removes+=("Removed file $filename | Last change on $(stat -c '%z' $filepath)")
+      rm $filepath
     fi
   fi
 done
