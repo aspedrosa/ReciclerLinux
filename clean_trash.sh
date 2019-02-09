@@ -1,23 +1,46 @@
 #!/bin/bash
 
-TRASH_DIR="$HOME/.trash"
-LOG_FILE="$HOME/.clean_trash.log"
+###############################################################
+#                                                             #
+# This script executes every time a user logs in              #
+# Goes over all the files on the trash directory and removes  #
+#  the ones that are there more than the delay defined        #
+#                                                             #
+###############################################################
+
+#################################################### Constants
+
+TRASH_DIR="$HOME/.trash"          # Path to the trash directory
+LOG_FILE="$HOME/.clean_trash.log" # Path to the log file of removes from trash
 MAX_DELAY=$((3 * 24 * 60 * 60))   # Time after which files on the trash are removed
 
-if ! [[ -a $TRASH_DIR ]] ; then # In the trash dir don't exit
-  mkdir $TRASH_DIR
+####################################################
+
+#################################################### Code
+
+# If the trash directory doesn't exist
+# -create the directory
+# -exit (Nothing to remove)
+if ! [[ -a $TRASH_DIR ]] ; then
+  mkdir $TRASH_DI
   exit 0
 fi
 
-removes=() # Holds the outputs of the removes
+removes=() # Holds the logs of removes
 
+# Iterate over all files on the trash
 for filename in $(ls $TRASH_DIR) ; do
+  # Time when the file was moved to the trash
   time_last_change=$(stat -c "%Z" $filename)
+
+  # Calculate the time that has passed since the move to the trash
   delay=$(($(date +"%s") - time_last_change))
+
+  # If the delay calculated exceeded the max delay defined remove it
   if [[ delay -gt MAX_DELAY ]] ; then
     if [[ -d $filename ]] ; then
       rm -r $filename
-      removes+=("Removed dir $filename | Last change on $(stat -c '%z' $filename)")
+      removes+=("Removed directory $filename | Last change on $(stat -c '%z' $filename)")
     else
       rm $filename
       removes+=("Removed file $filename | Last change on $(stat -c '%z' $filename)")
@@ -25,9 +48,12 @@ for filename in $(ls $TRASH_DIR) ; do
   fi
 done
 
-if [[ ${#removes[@]} -gt 0 ]] ; then # If anything was removed log it
+# If anything was removed log it (appends to the log file)
+if [[ ${#removes[@]} -gt 0 ]] ; then 
   date >> $LOG_FILE
   for log in "${removes[@]}" ; do
     echo $log >> $LOG_FILE
   done
 fi
+
+#################################################### Code
