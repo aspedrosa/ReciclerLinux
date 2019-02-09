@@ -12,7 +12,7 @@
 
 TRASH_DIR="$HOME/.trash"          # Path to the trash directory
 LOG_FILE="$HOME/.clean_trash.log" # Path to the log file of removes from trash
-MAX_DELAY=$((1))   # Time after which files on the trash are removed
+MAX_DELAY=$((3 * 25 * 60 * 60))   # Time after which files on the trash are removed
 
 ####################################################
 
