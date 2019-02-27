@@ -45,7 +45,7 @@ for filepath in "$@" ; do
 
   if ! [[ -a "$TRASH_DIR/$filename" ]] ; then #if there is no file with the same name on the trash just move it
     mv "$filepath" "$TRASH_DIR"
-    exit 0
+    continue
   fi
 
   # In case duplicates exist insert the file/directory with "-counter" at the end
@@ -62,7 +62,7 @@ for filepath in "$@" ; do
     # If there is no other file with that counter move it to the trash with the new name
     else
       mv "$filepath" "$new_filename"
-      break
+      continue
     fi
   done
 done
