@@ -62,7 +62,7 @@ for filepath in "$@" ; do
     # If there is no other file with that counter move it to the trash with the new name
     else
       mv "$filepath" "$new_filename"
-      continue
+      break
     fi
   done
 done
